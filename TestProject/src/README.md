@@ -172,3 +172,67 @@ System.out.println(Juicer.makeJuice(appleBox)); // 에러. FruitBox<Apple>
 >여러 가지 타입의 매개변수를 갖는 makeJuice()생성
 
     static Juice makeJuice (FruitBox< Apple> box) {}
+    
+> '메서드 중복 정의'로 인해 컴파일 에러가 발생한다. 이때 '와일드 카드' 사용
+
+- 와일드 카드 표현
+   - < ? extends T> 와일드 카드의 상한 제한. T와 그 자손들만 가능
+   - < ? super T> 와일드 카드의 하한 제한. T와 그 조상들만 가능
+   - < ?> 제한 없음. 모든 타입이 가능.
+ < ? extends Object〉와 동일  
+
+>> 와일드 카드를 사용한 결과
+ ```
+static Juice makeJuice(FruitBox<? extends Fruit> box) {
+    String tmp = "";
+    for(Fruit f : box.getList()) tmp += f + " ";
+    return new Juice(tmp);
+} 
+
+ ```
+ > FruitBox< fruit>뿐만 아니라, Fruit< Apple>도 가능하게 된다.
+
+      System.out.printIn(Juicer.makeJuice(appleBox)); // OK. FruitBox<Apple>
+
+> <예제들12->
+
+### 1.6 지네릭 메서드
+: 메서드의 선언부에 지네릭 타입이 선언된 메서드
+: 반환타입 바로 앞에 지네릭 타입 선언
+ - Collections.sort()
+
+        static <T> void sort(List<T> list, Comparator<? super T> c)
+- 지네릭 클래스에 정의된 타입 매개변수와 지네릭 메서드에 정의된 타입 매개변수는 전혀 별개의 것이다
+- 
+           class FruitBox<T> {
+               ...
+           static <T> void sort(List<T> list, Comparator<? super T> c) {
+               ...
+           }
+       }
+
+> 지네릭 메서드는 지네릭 클래스가 아닌 클래스에도 정의될 수 있다
+
+> FruitBox의 매개변수 T와 sort()의 매개변수 T는 타입문자만 같을 뿐 다르다
+>>  static멤버에는 타입 매개 변수를 사용할 수 없지만，메서드에 지네릭 타입을 선언하고 사용하는 것은 가능 
+
+-지역변수와 비슷하다. 메서드 내에서만 지역적으로 사용됨
+
+
+> 지네릭 메서드로 변경
+
+       static <T extends Fruit> Juice makeJuice(FruitBox<T> box) { 
+           String tmp = "";
+           for(Fruit f : box.getList()) tmp += f +" ";
+           return new Juice(tmp);
+       }
+
+       FruitBox<Fruit> fruitBox = new FruitBox<Fruit> (); 
+       FruitBox<Apple> appleBox = new FruitBox<Apple> ();
+
+       System.out.println(Juicer.<Fruit>makeJuice(fruitBox)); //타입 생략 가능
+       System.out.println(Juicer.<Apple>makeJuice(appleBox)); //타입 생략 가능
+
+       System.out.println (<Fruit>makeJuice (fruitBox)) ; //에러.클래스이름 생략불가 
+
+```

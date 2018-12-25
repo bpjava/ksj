@@ -220,19 +220,167 @@ static Juice makeJuice(FruitBox<? extends Fruit> box) {
 
 
 > 지네릭 메서드로 변경
-
+```
        static <T extends Fruit> Juice makeJuice(FruitBox<T> box) { 
            String tmp = "";
            for(Fruit f : box.getList()) tmp += f +" ";
            return new Juice(tmp);
        }
 
-       FruitBox<Fruit> fruitBox = new FruitBox<Fruit> (); 
+       FruitBox<Fruit> fruitBox = new FruitBox<Fruit> ();  //타입 변수에 타입을 대입
        FruitBox<Apple> appleBox = new FruitBox<Apple> ();
 
        System.out.println(Juicer.<Fruit>makeJuice(fruitBox)); //타입 생략 가능
        System.out.println(Juicer.<Apple>makeJuice(appleBox)); //타입 생략 가능
-
-       System.out.println (<Fruit>makeJuice (fruitBox)) ; //에러.클래스이름 생략불가 
-
 ```
+> fruitBox, appleBox의 선언부를 통해 컴파일러가 타입을 추정할 수 있기 때문에 생략해도 된다
+```
+   System.out.println(this.<Fruit>makeJuice(fruitBox)); //OK 
+   System.out.println(<Fruit>makeJuice (fruitBox)) ; //에러.클래스이름 생략불가 
+```
+> 대입된 타입을 생략할 수 없는 경우엔 참조변수(this)나 클래스 이름을 생략할 수 없다
+
+- 매개변수의 타입이 복잡할 때도 유용하다
+> Collections 클래스의 sort()
+> Comparable인터페이스를 구현한다는 것이지만 implements 사용안함
+
+       public static <T extends Comparable<? super T>> void sort (List<T> list)
+       
+ 1. List< T> :타입 T를 요소로 하는 List를 매개변수로 허용한다. 
+2. < T extends Comparable>:'T'는 Comparable을 구현한 클래스    
+3. Comparable<? super T>:'T'또는 그 조상의 타입을 비교하는 Comparable
+
+### 1.7 지네릭 타입의 형변환
+>지네릭 타입과 원시 타입의 형변환이 가능?
+가능하지만 경고 발생
+
+      Box box = null;
+      Box<Object> objBox = null; 
+      
+      box = (Box) objBox;     // OK. 지네릭 타입 -> 원시 타입 . 경고 발생
+      objBox = (Box<Object>)box;     // OK. 원시 타입 ―> 지네릭 타입. 경고 발생
+
+ 
+ 대입된 타입이 다른 지네릭 타입 간 변환도 불가능
+
+ >Box< String>이 Box<? extends Object>로 형변환 가능?
+ 가능하다
+
+        static Juice makeJuice(FruitBox<? extends Fruit> box){ ...}
+
+        FruitBox<? extends Fruit>box = new FruitBox<Fruit>();     //OK
+        FruitBox<? extends Fruit>box = new FruitBox<Apple>();     //OK
+
+
+>형변환 순서
+
+    public final class Optional<T> {
+        private static final Optional<?> EMPTY = new Optional<> ();
+        private final T value; 
+        ...
+        public static<T> Optional<T> empty() {
+             Optional<T> t = (Optional<T>) EMPTY; 
+             return t;
+              }
+        ...
+    }
+
+상수 EMPTY에 비어있는 Optional객체를 생성해서 저장했다가 empty()를 호출하면 형변환해서 반환
+
+    
+       Optional<?> EMPTY = new Optional<>();
+        -> Optional<? extends Object〉 EMPTY = new Optional<> () ;
+        -> Optional<? extends Object〉 EMPTY = new Optional<Object> () ;
+    
+- < ?>는 <? extends Object> 줄여서 쓴것
+- < > 안에 Object가 생략된것
+
+>> Optional< Object>가 아닌 Optional<?>로 한 이유?
+Optional< T>로 형변환이 가능
+
+    Optional<?>      wopt = new Optional<Object> () ;
+    Optional<Object〉 oopt = new Optional<Object> () ;
+
+    Optional<String> sopt = (Optional<String>) wopt; // OK.형변환 가능 
+    Optional<String> sopt = (Optional<String>) oopt; // 에러.형변환 불가
+
+> 와일드 카드가 사용된 지네릭 타입끼리 형변환가능하지만 경고
+    
+    FruitBox<? extends Object〉 objBox = null;
+    FruitBox<? extends String〉 strBox = null;
+    
+    strBox = (FruitBox<? extends String>) objBox; // OK. 미확정 타입으로 형변환 경고 
+    objBox = (FruitBox<? extends Object>) strBox; // OK. 미확정 타입으로 형변환 경고
+
+### 1.8 지네릭 타입의 제거
+: 컴파일러는 지네릭 타입을 이용해서 소스파일 체크하고, 형변환을 넣어준 후 제거한다
+
+(지네릭이 도입되기 이전 소스 코드와의 호환성 유지를 위해)
+
+- 지네릭 타입의 경계를 제거
+
+  
+         
+          class Box<T extends Fruit> { 
+              void add (T t) {
+              }
+           }
+  - T는 Fruit로 치환, 클래스 옆의 선언 제거
+
+         class Box {
+              void add(Fruit t) {
+              }
+         }
+ - 지네릭 타입 제거 후 타입이 일치하지 않으면, 형변환 추가
+        
+ ## 2. 열거형
+### 2.1 열거형이란?
+
+
+      class Card {
+           enum Kind { CLOVER, HEART, DIAMOND, SPADE } // 열거형 Kind를 정의
+           enum Value { TWO, THREE, FOUR } // 열거형 Value를 정의 
+           
+           final Kind kind; // 타입이 int가 아닌 Kind임에 유의하자.
+           final Value value; 
+      }
+
+### 2.2 열거형의 정의와 사용
+> 열거형 정의 
+
+       enum 열거형이름 { 상수명1, 상수명2, ... }
+       
+- 열거형에 정의된 상수 '열거형이름.상수명'
+
+        enum Direction { EAST, SOUTH, WEST, NORTH }
+
+        class Unit { 
+            int x, y; 
+            Direction dir;  // 열거형을 인스턴스 변수로 선언
+            
+            void init () { dir = Direction.EAST;   // 유닛의 방향을 EAST로 초기화 
+            
+            }
+        }
+
+
+
+- 열거형 상수간의 비교 '=='
+    
+    - 빠른 성능을 제공한다 
+    
+    - '<', '>'와 같은 비교연산자는 사용불가
+
+    - compareTo() 사용가능
+    (비교대상이 같으면 0, 왼쪽이 크면 양수, 오른쪽이 크면 음수)
+- switch문의 조건식에도 사용가능
+
+        void move () { 
+            switch(dir) { 
+                case EAST: x++; // Direction.EAST라고 쓰면 안된다.
+                 break; 
+                case WEST: x—— ;
+                 break;
+            }
+        }
+   열거형의 이름은 빼고 상수 이름만 적어야 함     

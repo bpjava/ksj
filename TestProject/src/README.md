@@ -384,3 +384,78 @@ Optional< T>로 형변환이 가능
             }
         }
    열거형의 이름은 빼고 상수 이름만 적어야 함     
+- 모든 열거형의 조상 -java.lang.Enum
+
+  -열거형 Direction에 정의된 모든 상수를 출력
+
+       Direction[] dArr = Direction.values();
+       
+       for(Direction d : dArr)   // for(Direction d : Direction.values())
+          System.out.printf("%s=%d%n", d.name(),d.ordinal();)
+
+    values(): 모든 상수를 배열에 담아 반환
+
+    ordinal(): java.lang.Enum클래스에 정의된 것      
+
+> Enum클래스에 정의된 메서드
+
+|메서드  | 설명|
+|:--:|:--:|
+|Class< E> getDeclaringClass|열거형의 Class객체를 반환| 
+|String name()|열거형 상수의 이름을 문자열로 반환 |
+|int ordinal|열거형 상수가 정의된 순서를 반환(0부터 시작)|
+|T valueOf(Class<T> enumType, String name)|지정된 열거형에서 name과 일치하는 열거형 상수를 반환 |
+
+<예제12-5>
+
+### 2.3 열거형에 멤버 추가하기
+
+- 열거형 상수의 값이 불규칙한 경우 값을 () 와 함께 적음
+- 지정된 값을 저장할 수 있는 인스턴스 변수와 생성자를 새로 추가
+- 열거형 상수를 먼저 정의한 후 추가
+
+      enum Direction { 
+          EAST (1) , SOUTH (5), WEST (-1), NORTH (10) ；  // 끝에 ';' 를 추가해야 한다.
+          
+          private final int value;  // 정수를 저장할 필드 (인스턴스 변수) 를 추가 
+          Direction (int value) { this.value = value; } // 생성자를 추가
+
+          public int getValue() {return value; } 
+      }
+
+#### 추상 메서드 추가하기
+참고)
+
+        enum Transportation {
+             BUS(100) { int fare(int distance) { return distance*BASIC_FARE;}}, 
+             TRAIN(150) { int fare(int distance) { return distance*BASIC _FARE; }}, 
+             SHIP(100) { int fare(int distance) { return distance*BASIC_FARE; }},
+             AIRPLANE(300) { int fare(int distance) { return distance*BASIC_FARE; }}；
+
+             abstract int fare (int distance) ; // 거리에 따른 요금을 계산하는 추상 메서드 
+             protected final int BASIC_FARE; // protected로 해야 각 상수에서 접근가능 
+
+### 2.4 열거형의 이해
+
+      enum Direction {EAST, SOUTH, WEST, NORTH}
+
+-클래스로 정의
+
+      class Direction { 
+          static final Direction EAST = new Direction ("EAST”) ;
+          static final Direction SOUTH = new Direction("SOUTH");
+          static final Direction WEST = new Direction("WEST”);
+          static final Direction NORTH = new Direction ("NORTH") ; 
+
+          private String name;
+          private Direction(String name) { this.name = name; }
+      }
+  -static tkdtn EAST, SOUTH, WEST, NORTH의 값은 객체의 주소(변하지않으므로 '==' 가능) 
+
+  <ordinal예제12-8>   
+
+  ## 3.애너테이션
+  ### 3.1 애너테이션이란?
+  
+
+  

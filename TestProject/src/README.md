@@ -450,12 +450,56 @@ Optional< T>로 형변환이 가능
           private String name;
           private Direction(String name) { this.name = name; }
       }
-  -static tkdtn EAST, SOUTH, WEST, NORTH의 값은 객체의 주소(변하지않으므로 '==' 가능) 
+  -static 상수 EAST, SOUTH, WEST, NORTH의 값은 객체의 주소(변하지않으므로 '==' 가능) 
 
   <ordinal예제12-8>   
 
   ## 3.애너테이션
   ### 3.1 애너테이션이란?
-  
+: 소스코드 안에 다른 프로그램을 위한 정보를 지정된 형식으로 포함시킨 것
+
+- 주석 /** ~ */에 소스코드에 대한 설명을 넣고, @ 태그로 주석안에 정보를 저장
+
+- 장점: 프로그래밍 언어에 영향 없으면서 정보를 제공
+
+#### 특정메서드만 테스트 @Test
+
+@Test //이 메서드가 테스트 대상임을 알림  
+public void method(){
+    ...
+}
+
+### 3.2 표준 애너테이션
+
+> 기본적으로 제공하는 표준 애너테이션(*은 메타 애너테이션)
+
+|애너테이션  | 설명|
+|:--:|:--:|
+|@Override|오버라이딩하는 메서드|
+|@Deprecated|사용하지 않도록 권장하는 대상|  
+|@SuppressWarnings|특정 경고메시지가 나타나지 않게 함| 
+|@SafeVarargs|지네릭스 타입의 가변인자| 
+|@FunctionalInterface|함수형 인터페이스라고 알림| 
+|@Native|native메서드에서 참조되는 상수 앞| 
+|@Target*|애너테이션이 적용가능한 대상 지정| 
+|@Documented*|애너테이션 정보가 javadoc으로 작성된 문서에 포함|
+|@Inherited*|애너테이션이 자손 클래스에 상속되도록|
+|@Retention*|애너테이션이 유지되는 범위 지정|
+|@Repeatable* |애너테이션을 반복해서 적용| 
+
+#### @Override
+: 조상의 메서드를 오버라이딩하는 것을 컴파일러에 알림
+
+메서드 앞에만 붙임
+- 오버라이딩할 때 메서드의 이름을 잘못 적을 시 지나치는 오류를 방지
+
+       class Parent { 
+           void parentMethod() { } 
+           }
+       class Child extends Parent {
+            @Override
+            void parentmethodO { } // 조상 메서드의 이름을 잘못 적 었 음 .
+
+
 
   

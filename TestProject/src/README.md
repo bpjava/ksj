@@ -667,3 +667,100 @@ public void method(){
 
 ### 3.4 애너테이션 타입 정의
 
+- 새로운 애너테이션을 정의하는 방법
+           
+            @interface 애너테이션이름 {
+                 타입 요소 이름() ;     // 애너테이션의 요소를 선언한다
+                 ...
+            }
+ #### 애너테이션의 요소
+
+
+            @interface TestInfo { 
+                int count (); 
+                String testedBy(); 
+                String[] testTools();
+                TestType testType(); 
+                DateTime testDate(); 
+            }
+- 특징
+  - 반환값이 있고 추상 메서드의 형태 가짐
+  - 상속을 통해 구현하지 않아도 됨
+  - 순서는 상관없다
+  - 요소는 기본값을 가질 수 있다
+
+> 애너테이션 요소가 한개이고 이름이 value 인 경우
+
+            @interface TestInfo { 
+                String value ();
+             } 
+             
+             @TestInfo("passed”)    // @TestInfo(value="passed") 와 동일 
+             class NewClass{...}
+
+
+요소의 이름 생략하고 값만 적어도 됨
+> 요소의 타입이 배열인 경우
+
+            @interface Testlnfo {
+                String [ ] testTools () ;
+             }
+             @Test (testTools={"JUnit","AutoTester" })         // 값이 여러 개인 경우 
+             @Test (testTools="JUnit")                        // 값이 하나일 때는 괄호 생략가능 
+             @Test (testTools={ })                        // 값이 없을 때는 괄 호 반드시 필요
+
+> 기본값이 여러개일 경우
+
+            String [] info() default { "aaa”, "bbbn } ; // 기본값이 여러 개인 경우. 괄호 사용          
+#### java.lang.annotation.Annotation
+Annotation : 모든 애너테이션의 조상
+- 애너테이션은 상속이 허용되지 않으므로 조상으로 지정 못함
+
+             @interface TestInfo extends Annotation {  //에러. 허용되지 않는 표현
+             int count();
+             String testedBy();
+                 ...
+             }
+- Annotation은 애너테이션이 아닌 인터페이스
+
+             package java.lang.annotation; 
+             
+             public interface Annotation {  // Annotation자신은 인터페이스이다
+                boolean equals(Object obj ) ; 
+                int hashCode(); 
+                String toString(); 
+              
+                Class<? extends Annotation> annotationType () ; // 애너테이션의 타입을 반환 
+                
+            }
+
+> equals(), hashCode(), toString()과 같은 메서드를 호출 가능              
+
+#### 마커 애너테이션
+: 값을 지정할 필요가 없을 때, 요소가 하나도 정의되지 않은 애너테이션
+
+            @Target(ElementType.METHOD) 
+            ©Retention(RetentionPolicy.SOURCE) 
+            public @interface Override {}   // 마커 애너테이션.정의된 요소가 하나도 없다.
+
+            @Target(ElementType.METHOD) 
+            @Retention(RetentionPolicy.SOURCE) 
+            public @interface Test {}   // 마커 애너테이션.정의된 요소가 하나도 없다.
+
+#### 애너테이션 요소의 규칙
+1. 요소의 타입은 기본형, String, enum, 애너테이션, Class만 허용   
+2. ()안에 매개변수를 선언할 수 없음
+3. 예외를 선언할 수 없음
+4. 요소를 타입 매개변수로 정의 할 수 없음
+ > 예시
+    
+      @interface AnnoTest{
+          int id = 100;                     //OK.상수 선언
+          String major(int i, int j);       //에러.매개변수 선언 불가
+          String minor() throws Exception;  //에러.예외 선언 불가
+          ArrayList<T> list();              //에러.요소의 타입에 타입 매개변수 사용불가
+
+      }
+
+
+

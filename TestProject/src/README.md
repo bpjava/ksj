@@ -492,14 +492,178 @@ public void method(){
 
 메서드 앞에만 붙임
 - 오버라이딩할 때 메서드의 이름을 잘못 적을 시 지나치는 오류를 방지
+- 조상에 있는지 확인하고 없으면, 에러메시지를 출력 
 
        class Parent { 
            void parentMethod() { } 
            }
        class Child extends Parent {
             @Override
-            void parentmethodO { } // 조상 메서드의 이름을 잘못 적 었 음 .
+            void parentmethod() { } // 조상 메서드의 이름을 잘못 적었음.
 
 
+-일반적으로 새로운 이름의 메서드가 추가된 것으로 인식
 
+-오류가 발생 하지 않고 조상의 메서드가 호출
+
+  #### @Deprecated
+: 더이상 사용되지 않는 필드나 메서드를 알림
+
+- 기존의 것 대신 새로 추가된 개선된 기능을 사용하도록 유도
+
+> getDate()보단 get() 사용하도록 유도
+
+           int getDate () 
+           Deprecated. 
+           As of JDK version 1.1, replaced by Calendar. get (Calendar. DAY_OF_MONTH).
+  -권할 뿐 강제성은 없기 때문에 컴파일 실행됨
   
+  >사용 시 메시지가 나타남
+
+          Note : AnnotationEx2.j ava uses or overrides a deprecated API. 
+          Note : Recompile with -XIint:deprecation for details.
+
+ #### @FunctionalInterface
+: 함수형 인터페이스를 선언할때 알림
+
+- 함수형 인터페이스를 올바르게 선언 했는지 확인, 잘못된 경우 에러 발생
+- 실수 방지
+ 
+          @FunctionalInterface 
+          public interface Runnable {
+               public abstract void run () ; // 추상 에서드 }
+
+ #### @SuppressWarnings
+: 컴파일러가 보여주는 경고메시지가 나타나지 않게 함
+
+- 경우에 따라  묵인해야하는 경고가 발생하는 대상에 붙임
+- 억제할 수 있는 경고 메시지 
+  - deprecation : @Deprecated를 사용해서 발생
+  - unchecked : 지네릭스로 타입을 미지정했을 때 발생
+  - rawtypes : 지네릭스를 사용하지 않아서 발생
+  - varargs : 가변인자의 타입이 지네릭 타입일 때 발생
+
+        @SuppressWarnings ("unchecked")     // 지네릭스와 관련된 경고를 억제
+        ArrayList list = new ArrayList () ; // 지네릭 타입을 지정하지 않았음
+        list.add (obj) ;                   // 여기서 경고가 발생
+
+<예제 12-11>
+
+ #### @SafeVarargs
+: 코드에 문제가 없다면 이경고를 억제하기 위해 사용
+
+- 가변인자의 타입이 non-reifiable타입일 경우 'unchecked'경고 발생
+  -  reifiable타입: 컴파일 후에도 제거되지 않는 타입
+  -  non-reifiable타입 : 제거되는 타입(지네릭 타입들은 대부분)
+- 생성자, static, final이 붙은 메서드에만 사용가능
+> java.util.Arrays의 asList()
+
+          public static <T> List<T> asList(T ... a) {
+               return new ArrayList<T> (a) ; // ArrayList (E [］ array) 를 호출.경고발생 
+          }
+-asList()의 매개변수가 가변인자이며 지네릭 타입
+
+-타입T는 컴파일 과정에서 Object로 바뀜         
+
+-Object[] 에는 모든 타입의 객체가 들어올 가능성 있으므로 위험하다고 경고 메시지
+- @SuppressWarnings(’’unchecked”)사용 시, 메서드 선언뿐만 아니라 두 메서드가 호출되는 곳에도 넣아야 함
+- ‘varargs’경고는 억제할 수 없다
+
+          @SafeVarargs                       // 'unchecked'경고를 억제한다
+          @SuppressWarnings ("varargs")      // 'varargs'경고를 억제한다.
+          public static <T> List<T> asList(T... a) {
+                return new ArrayList<>(a) ;
+                 }
+
+### 3.3 메타 애너테이션
+: 애너테이션에 붙이는 애너테이션
+
+애너테이션의 적용대상이나 유지기간 등을 지정
+
+#### @Target
+: 애너테이션이 적용가능한 대상을 지정
+> @SuppressWarnings에 적용할 수 있는 대상
+
+         @Target({TYPE, FIELD, METHOD, PARAMETER,CONSTRUCTOR, LOCAL_VARIABLE})
+         @Retention(RetentionPolicy.SOURCE) 
+         public @interface SuppressWarnings { 
+             String[] value();
+         }
+> 적용대상 종류
+
+|대상 타입  | 의미|
+|:--:|:--:|
+|ANNOTATION_TYPE|애너테이션|
+|CONSTRUCTOR|생성자|
+|FIELD|필드(멤버면수,enum상수)|
+|LOCAL_VARIABLE|지역변수|
+|METHOD|메서드|
+|PACKAGE|패키지|
+|PARAMETER|매개변수|
+|TYPE|타입(클래스,인터페이스,enum)|
+|TYPE_PARAMETER|타입 매개변수|
+|TYPE_USE|타입이 사용되는 모든 곳|
+
+#### @Retention
+: 애너테이션이 유지(retention)되는 기간을 지정
+> 유지정책의 종류
+
+|유지 정책 | 의미|
+|:--:|:--:|
+|SOURCE|소스 파일에만 존재. 클래스파일에는 존재하지 않음|
+|CLASS|클래스 파일에 존재. 실행시에 사용불가. 기본값|
+|RUNTIME|클래스 파일에 존재. 실행시에 사용가능|
+
+- '@Override'나 '@SuppressWarnings’처럼 컴파일러에 의해 사용되는 애너테이션은 유지 정책이 'SOURCE'
+    
+        @Target(ElementType.METHOD)
+        @Retention(RetentionPolicy.SOURCE)
+        public ©interface Override { }
+
+- @FunctionalInterface 는 실행시에도 사용되므로 'Runtime'
+
+        @Documented
+        @Retention(RetentionPolicy.RUNTIME) 
+        @Target(ElementType.TYPE) 
+        public @interface Functionallnterface { }
+
+#### @Documented
+: 애너테이션 정보가 javadoc으로 작성한 문서에 포함되도록 함
+- '@Override'와 '@SuppressWarnings’를 제외하고 모두 붙어 있다
+> 위 코드 참고
+
+#### @Inherited
+: 애너테이션이 자손 클래스에 상속되도록 함
+- 조상클래스에 붙이면, 자손 클래스도 이 애너테이션이 붙은 것 같이 인식된다
+
+          ©Inherited       // @SupperAnno가 자손까지 영향 미치게
+          @interface SupperAnno { } 
+          
+          @SuperAnno 
+          class Parent { }
+
+          class Child extends Parent { }    // Child에 애너테이션이 안 붙었지만, 붙은 것으로 인식
+
+#### @Repeatable
+: 보통 대상 하나에 한 종류 애너테이션 붙이지만
+이를 통해 여러번 붙일 수 있음
+
+         @interface ToDos {         // 여러 개의 ToDo애너테이션을 담을 컨테이너 애너테이션 
+            ToDo[] value () ;       // ToDo애너테이션 배열타입의 요소를 선언.이름이 반드시 value이어야 함
+         }
+
+         @Repeatable (ToDos.class)  // 괄호 안에 컨테이너 애너테이션을 지정해 줘야한다.
+         @interface ToDo { 
+             String value () ;
+         }
+         @ToDo ("delete test codes ")
+         @ToDo ("override inherited methods")
+          class MyClass {
+              ...
+           }
+
+#### @Native
+: 네이티브 메서드에 의해 참조되는 상수 필드에 붙이는 애너테이션
+
+### 3.4 애너테이션 타입 정의
+

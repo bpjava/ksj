@@ -114,6 +114,15 @@ Box< Grape> grapeBox = new Box< Grape> () ; //Grape 객체만 저장가능
       
      appleBox.add (new Grape () ) ; / / 에러 . Box<Apple>에는 Apple객체만 추가가능
 
+ 5.  T가 Fruit 인경우, Fruit 의 자손들은 매개변수 가능
+
+     Box< Fruit> fruitBox = new Box< Fruit>(); 
+
+     fruitBox.add(new Fruit ()); //OK. 
+
+     fruitBox.add (new Apple () ) ; // OK. void add (Fruit item)
+
+
    >  <예제12-1>
 
 ### 1.4 제한된 지네릭 클래스
@@ -194,7 +203,7 @@ static Juice makeJuice(FruitBox<? extends Fruit> box) {
 
       System.out.printIn(Juicer.makeJuice(appleBox)); // OK. FruitBox<Apple>
 
-> <예제들12->
+> <예제12-3>
 
 ### 1.6 지네릭 메서드
 : 메서드의 선언부에 지네릭 타입이 선언된 메서드
@@ -265,6 +274,8 @@ static Juice makeJuice(FruitBox<? extends Fruit> box) {
 
  >Box< String>이 Box<? extends Object>로 형변환 가능?
  가능하다
+
+ Box<? extends Object〉 wBox = new Box< String> () ;
 
         static Juice makeJuice(FruitBox<? extends Fruit> box){ ...}
 
@@ -406,7 +417,7 @@ Optional< T>로 형변환이 가능
 |int ordinal|열거형 상수가 정의된 순서를 반환(0부터 시작)|
 |T valueOf(Class<T> enumType, String name)|지정된 열거형에서 name과 일치하는 열거형 상수를 반환 |
 
-<예제12-5>
+> <예제12-5>
 
 ### 2.3 열거형에 멤버 추가하기
 
@@ -422,6 +433,8 @@ Optional< T>로 형변환이 가능
 
           public int getValue() {return value; } 
       }
+
+
 
 #### 추상 메서드 추가하기
 참고)
@@ -452,7 +465,26 @@ Optional< T>로 형변환이 가능
       }
   -static 상수 EAST, SOUTH, WEST, NORTH의 값은 객체의 주소(변하지않으므로 '==' 가능) 
 
-  <ordinal예제12-8>   
+> ordinal
+
+         abstract class MyEnum<T extends MyEnum<T>> implements Comparable<T> { 
+             static int id = 0; // 객체에 붙일 일련번호 (0부터 시작)
+             
+             int ordinal;
+             String name = "";
+
+             public int ordinal() { return ordinal; }
+
+             MyEnum(String name) { 
+                 this.name = name; 
+                 ordinal = id++; // 객체를 생성할 때마다 id의 값을 증가시킨다.  
+             }
+             public int compareTo(T t) { 
+                 return ordinal - t.ordinal(); 
+             }
+         }
+
+  > <ordinal예제12-8>   
 
   ## 3.애너테이션
   ### 3.1 애너테이션이란?
@@ -523,6 +555,7 @@ public void method(){
           Note : AnnotationEx2.j ava uses or overrides a deprecated API. 
           Note : Recompile with -XIint:deprecation for details.
 
+> <예제12-10>
  #### @FunctionalInterface
 : 함수형 인터페이스를 선언할때 알림
 

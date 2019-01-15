@@ -296,17 +296,35 @@ Writer
 
  366p, 표 참고
 
-367p, 예제15-9
+367p, 예제15-9,15-10,15-11,15-12
+
+### 3.4 SequenceInputStream
+
+> 여러개의 입력스트림을 연속적으로 연결해서 하나의 스트림으로부터 데이터를 읽는 것과 같이 처리할 수 있도록 함
+
+- 큰 파일을 여러 개의 작은 파일로 나눴다가 하나의 파일로 합치는 것과 같은 작업을 수행할 때 사용하면 좋음
+
+> SequenceInputStream 생성자
+
+|메서드/생성자|설명
+|:--:|:--:|
+|SequenceInputStream(Enumeration e)|Enumeration에 저장된 순서대로 입력스트림을 하나의 스트림으로 연결
+|SequenceInputStream(InputStream s1,InputStream s2)|두 개의 입력스트림을 하나로 연결
+
+> Vector에 연결할 입력스트림들을 저장한 후 Vector의 Enumeration elements()를 호출해서 생성자의 매개변수로 사용
+
+373p,예제 15-14
+- Vector에 저장된 순서대로 입력되므로 순서에 주의
+
+### 3.5 PrintStream
+
+> 데이터를 기반스트림에 다양한 형태로 출력할 수 있는 print, println, printf와 같은 메서드를 오버로딩하여 제공
+
+- 데이터를 문자로 출력하므로 문자기반스트림
+- PrintStream과 PrintWriter은 거의 같은 기능이지만 PrintWriter가 다양한 언어의 문자를 처리하는데 적합
 
 
-
-
-
-
-
-
-
-
+374p PrintStream의 생성자, 메서드
 
 
 

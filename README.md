@@ -183,6 +183,139 @@ Writer
 
 355p,예제 15-1,2,3,4
 
+### 2.3 FileInputStream과 FileOutputStream
+
+> 파일에 입출력을 하기 위한 스트림. 실제 많이 사용되는 스트림
+
+> FileInputStream, FileOutputStream 생성자
+
+|생성자|설명|
+|:--:|:--:|
+|FileInputStream(String name)|지정된 파일이름을 가진 실제 파일과 연결된FileInputStream 생성
+|FileInputStream(File file)|파일의 이름이 String이 아닌 File인스턴스로 지정,FileInputStream(String name)과 같다|
+|FileInputStream(FileDescripter fdObj)|파일 디스크립터(fdObj)로 FileInputStream생성|
+|FileOutputStream(String name)|지정된 파일이름을 가진 실제 파일과의 연결된 FileOutStream을 생성
+|FileOutputStream(String name,boolean append)|지정된 파일이름을 가진 실제 파일과 연결된 FileOutputStream을 생성, 두번째 인자인 append를 true로 하면, 출력시 기존의 파일내용을 마지막에 덧붙임,false면 기존의 파일내용을 덮어씀
+|FileOutputStream(File file)|파일이름을 File인스턴스로 지정,FileOtputStream(String name)과 같음
+|FileOutputStream(File file,boolean append)|파일이름 File인스턴스
+|FileOutputStream(FileDescriptor fdObj)|파일 디스크립터로 FileOutputStream을 생성
+
+360p,예제15-6
+
+## 3. 바이트기반의 보조스트림
+### 3.1 FilterInputStream과 FilterOutputStream
+
+> InputStream/OutputStream의 자손, 모든 보조스트림의 조상
+
+보조스트림은 자체적으로 입출력 수행 불가능해서 기반 스트림을 필요로 함
+
+       ptotected FilterInputStream(InputStream in)
+       public FilterOutputStream(OutputStream out)
+
+
+- 자체적으로 아무 일도 하지않고 단순히 기반스트림의 메서드를 그대로 호출함
+- 상속을 통해 원하는 작업을 수행하도록 읽고 쓰는 메서드를 오버라이딩해야 한다
+
+       public class FilterInputStream extends InputStream{
+           protected volatile InputStream in;
+           protected FilterInputStream(InputStream in){
+               this.in=in;
+           }
+           public int read() throws IOException{
+               return in.read();
+           }
+           ...
+       }
+
+- 제어접근자가 protected 이기 때문에 FilterInputStream의 인스턴스르 생성해서 사용할 수 없고 상속을 통해서 오버라이딩되어야 한다
+  - FilterInputStream의 자손 - BufferedInputStream, DataInputStream, PushbackInputStream 등
+  - FilterOutputStream의 자손 - BufferedOutputStream, DataOutputStream, PtintStream 등
+
+### 3.2 BufferedInputStream과 BufferedOutputStream
+
+> 입출력 효율을 높이기 위해 버퍼를 사용하는 보조스트림
+- 한 바이트씩 입출력하는 것보다 버퍼를 이용해서 한번에 여러 바이트 입출력하는 것이 빠르게 때문에 사용
+
+ > BufferedInputStream의 생성자
+
+ |생성자|설명|
+ |:--:|:--:|
+ |BufferedInputStream(InpuStream in, int size)|주어진 IputStream인스턴스를 입력소스로 하며 지정된 크기의 버퍼를 갖는 BufferedInputStream인스턴스 생성
+ |BufferedInputStream(InputStream in)|주어진 InputSteam인스턴스를 입력소스로 하며 버퍼의 크기를 지정하지 않았으므로 기본적으로 8192 byte크기 버퍼 가짐
+
+> 버퍼 크기지정
+- BufferedInputStream 의 버퍼크기는 입력소스로부터 한 번에 가져올 수 있는 데이터 크기로 지정
+- 입력소스가 파일인 경우 보통 1024~2048또는 4096 크기
+
+> 특징
+- read를 호출하면, 입력소스로부터 버퍼 크기만큼 데이터를 읽어다 자신의 내부버퍼에 저장
+- 프로그램에선 버퍼에 저장된 데이터를 읽으면 됨
+- 외부의 입력소스로 부터 읽는 것보다 내부 버퍼에서 읽는 것이 더 빠름
+
+> BufferedOutputStream 생성자와 메서드
+
+|메서드/생성자|설명|
+|:--:|:--:|
+|BufferedOutputStream(OutputStream out, int size)|주어진 OutputSTream인스턴스를 출력소스로 하며 지정된 크기를 버퍼를 가짐
+|BufferedOutputStream(OutputStream out)|주어진 OutputStream인스턴스를 출력소스로하며 버퍼의 크기를 지정해주지 않으므로 기본적으로 8192byte 크기를 갖는다
+|flush()|버퍼의 모든 내용을 출력소스에 출력한 후 버퍼를 비운다
+|close()|flush()를 호출해서 버퍼의 모든 내용을 출력소스에 출력,BufferedOutputStream인스턴스가 사용하던 모든 자원을 반환
+
+- 프로그램에서 write메서드를 이용한 출력이 BufferedOutputStream의 버퍼에 저장됨
+- 버퍼가 가득 차면, 그 때 버퍼의 모든 내용을 출력소스에 출력함
+- 버퍼를 비우고 다시 출력을 저장할 준비함
+    - 마지막 출력부분이 출력소스에 쓰이지 못하고 버퍼에 남아있는 채로 프로그램이 종료될 수 있다는 걸 주의
+
+364p,예제15-7
+
+> FilterOutputStream
+
+         public class FilterOutputStream extends OutputStream{
+             protected OutputStream out;
+             public FilterOutputStream(OutputStream out){
+                 this.out = out;
+             }
+             ...
+         
+         public void close() throws IOException{
+             try(
+                 flush();
+            }catch(IOException ignored{}
+            out.close(); //기반스트림의 close() 호출
+         }
+     }
+   
+365p
+
+ ### 3.3 DataInputStream과 DataOutputStream
+
+   > FilterInputStream/FilterOutput의 자손
+
+   - byte단위가 아닌, 8가지 기본 자료형의 단위로 읽고 쓸 수 있다
+   - 각 기본 자료형 값을 16진수로 표현하여 저장
+
+ 366p, 표 참고
+
+367p, 예제15-9
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -327,6 +327,169 @@ Writer
 374p PrintStream의 생성자, 메서드
 
 
+## 4. 문자기반 스트림
+
+### 4.1 Reader와  Writer
+
+> byte배열 대신 char배열을 사용한다는 것 외엔 InputStream/OutputStream 과 비슷하다
+
+- Reader는 특정 인코딩을 읽어서 유니코드로 변환, Writer는 유니코드를 특정 인코딩으로 변환하여 저장
+
+p378 Reader,Writer메서드 종류 표
+
+### 4.2 FileReader와 FileWriter
+> 파일로부터 텍스트데이터를 읽고, 파일에 쓰는데 사용
+
+FileInputStream/FileOutputStream 과 사용방법 같음
+
+p379 예제15-16
+
+### 4.3 PipedReader와 PipedWriter
+
+> 쓰레드 간에 데이터를 주고받을 때 사용
+
+- 다른 스트림과 다르게 입력과 출력을 하나의 스트림으로 연결해서 데이터를 주고받음
+
+- 스트림 생성 후, 한쪽 쓰레드에서 connect()를 호출해서 입,출력 스트림을 연결
+- 입출력 마친 후, 어느 한쪽 스트림만 닫아도 나머지 스트림 자동으로 닫힘
+
+p381,예제 15-18
+
+### 4.4 StringReader와 StringWriter
+
+> CharArrayReader/CharArrayWriter와 같이 입출력 대상이 메모리인 스트림
+
+- StringWriter에 출력되는 데이터는 내부의 StringBuffer에 저장됨
+
+       StringBuffer getBuffer()  StringWriter에 출력한 데이터가 저장된 StringBuffer를 반환
+       String toString()  StringWriter에 출력된(버퍼에 저장된) 문자열을 반환
+
+p383 예제15-19       
+
+## 5. 문자기반 보조스트림
+
+### 5.1 BufferedReader 와 BufferedWriter 
+
+> 버퍼를 이용해서 입출력의 효율을 높일 수 있도록 해줌
+
+- BufferedReader 의 readLine() : 데이터를 라인단위로 읽어 올 수 있음 
+- BUfferedWriter 의 newLine() : 줄바꿈 해줌
+
+p384, 예제15-20
+
+### 5.2 InputStreamReader와 OutputStreamWriter
+
+> 바이트기반스트림을 문자기반스트림으로 연결해줌
+
+-  바이트기반 스트림의 데이터를 지정된 인코딩 문자데이터로 변환
+
+> InputStreamReader의 생성자,메서드
+
+|생성자/메서드|설명|
+|:--:|:--:|
+|InputStreamReader(InputStream in)|OS에서 사용하는 기본 인코딩의 문자로 변환|
+|InputStreamReader(InputStream in,String encoding)|지정된 인코딩을 사용|
+|String getEncoding()|InputSTreamReader의 인코딩을 알려줌|
+
+> OutputSTreamWriter의 생성자,메서드
+
+|생성자/메서드|설명|
+|:--:|:--:|
+|OutputStreamWriter(OuputStream in)|OS에서 사용하는 기본 인코딩의 문자로 변환|
+|OutputStreamWriter(OuputStream in,String encoding)|지정된 인코딩을 사용|
+|String getEncoding()|OutputStreamWriter의 인코딩을 알려줌|
+
+- 한글윈도우에서 중국어로 작성된 파일을 읽을 때 InputStreamReader(InputSteam in, String encoding)를 이용해서 인코딩이 중국어로 되어 있다는 것을 지정해야함
+- 파일에 텍스트 데이터를 저장할때 OutputStreamWriter(InputSteam in, String encoding)을 이용해서 인코딩을 지정
+
+
+p386, 에제15-21
+
+
+## 6. 표준입출력과 File
+### 6.1 표준입출력 -System.in, System.out, System.err
+
+> 표준입출력: 콘솔을 통한 데이터 입력과 콘솔로의 데이터 출력
+
+> 자바 어플 실행과 동시에 자동적으로 생성됨. 별도 스트림 생성 필요 없음
+
+- System.in : 콘솔로부터 데이터를 입력받음
+- System.out : 콘솔로 데이터를 출력
+- System.err : 콘솔로 데이터를 출력
+
+p388
+
+### 6.2 표준입출력의 대상변경 - setOut(), setErr(), setIn()
+
+> 입출력을 콘솔 이외의 다른 입출력 대상으로 변경하는 것이 가능
+
+|메서드|설명|
+|:--:|:--:|
+|static void setOut (PrintStream out)|System.out의 출력을 지정된PrintStream으로 변경|
+|static void setErr (PrintStream err)|System.err의 출력을 지정한PrintStream으로 변경|
+|static void setIn (InputStream in)|System.in의 출력을 지정된inputStream으로 변경|
+
+p391, 예제15-24
+
+
+### 6.3 RandomAccessFile
+
+> 하나의 클래스로 파일에 대한 입력,출력을 모두 할 수 있다
+
+- InputStream, OutputStream으로부터 상속받지 않음
+-  DataInput, DataOutput인터페이스를 모두 구현한다
+- DataInputStream, DataOutputStream처럼 기본자료형 단위로 데이터 읽고 씀
+     - 파일의 어느 위치나 가능
+     - 내부 파일 포인터 사용
+
+> RandomAccexxFile 생성자,메서드 
+
+|생성자/메서드|설명|
+|:--:|:--:|
+|RandomAccessFile(File file, String mode)RandomAccessFile(String fileNme, String mode)|주어진 file에 읽기와 쓰기를 하기 위한 RandomAccessFile인스턴스를 생성|
+|FileChannel getChannel()|파일의 파일채널 반환|
+|FileDescriptor getFD()|파일의 파일 디스크립터 반환|
+|long getFilePointer()|파일의 포인터 위치 알려줌
+|long length()|파일의 크기 얻음
+|void seek(long pos)|파일 포인터의 위치를 변경
+|void setLength(long newLength)|파일의 크기를 지정된 길이로 변경
+|int skipBytes(int n)|지정된 수만큼의 byte를 건너뜀
+
+p394,예제15-25,26
+
+
+### 6.4 File
+
+> File의 생성자와 경로 메서드
+
+|생성자/메서드|설명|
+|:--:|:--:|
+|File(String fileName)|fileName을 이름으로 갖는 파일을 위한 File인스턴스 생성,프로그램 실행되는 위치가 경로로 간주|
+|File(String pathName, String fileName) File(File pathName, String fileName)|파일의 경로와 이름을 따로 분리해서 지정|
+|File(URL url) |지저된 url로 파일생성|
+| String getName()| 파일이름을 String으로 반환|
+|String getPath()|파일의 경로를 String으로 반환
+|String getAbsolutePath()|파일의 절대경로를 String으로 반환
+| String getAbsoluteFile()| 파일의 절대경로를 File로 반환
+|String getParent()|파일의 조상 디렉토리를 String으로 반환
+|File getParentFile()|파일의 조상 디렉토리를 File로 반환
+|String getcanonicalPath()|파일의 정규경로를 String로 반환|
+|File getcanonicalFile()|파일의 정규경로를 File로 반환
+
+> 경로와 관련된 File의 멤버변수
+
+|멤버변수|설명|
+|:--:|:--:|
+|static String pathSeparator|OS에서 사용하는 경로 구분자, 윈도우";",유닉스":"
+|static char pathSeparatorChar|OS에서 사용하는 경로 구분자, 윈도우";",유닉스":"
+|static String separator|OS에서 사용하는 이름 구분자, 윈도우"W",유닉스"/"|
+|static char separatorChar|OS에서 사용하는 이름 구분자, 윈도우"W",유닉스"/"
+
+- 절대경로 : 파일시스템의 루트로부터 시작하는 파일의 전체 경로, 여러개 존재 가능
+- 기호나 링크 등을 포함하지 않는 유일한 경로
+
+p398.......
+예제15-30
 
 
 
@@ -348,6 +511,82 @@ Writer
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+## 7. 직렬화
+### 7.1 직렬화란?
+
+> 객체에 저장된 데이터를 스트림에 쓰기위해 연속적인 데이터로 변환하는 것
+
+p415 그림15-7
+
+- 객체는 오직 인스턴스변수들로만 구성됨
+- 객체엔 메서드가 포함되지 않음
+- 인스턴스변수는 인스턴스마다 다른 값을 가져야되기 때문에 별도의 메모리공간 필요
+
+그림 15-8
+
+### 7.2 ObjectInputStream，ObjectOutputStream
+
+> 각각 InputStream, OutputStream을 직접 상속받고, 기반스트림을 필요하는 보조스트림
+
+
+- 직렬화 : ObjectOutputStream
+- 역직렬화 : ObjectInputStream
+
+객체를 생성할 때 입출력할 스트림 지정
+
+           ObjectInputStream(InputStream in)
+           ObjectOutputStream(OutputSTream out)  
+
+1. 파일에 객체를 저장하고 싶다면(직렬화)
+         
+         FileOutputStream fos = new FileOutputStream ("objectfile.ser");
+         ObjectOutputStream out = new ObjectOutputStream (fos);
+
+         out.writeObject(new UserInfo());
+
+- 출력할 스트림 (FileOutputStream)을 생성
+- 이를 기반스트림으로 하는 ObjectOutputStream 생성
+
+2. 객체를 출력(역직렬화)
+
+         
+         FileInputStream fIs = new FileInputStream ("objectfile.ser");
+         ObjectInputStream in = new ObjectInputStream (fis);
+
+         UserInfo info = (UserInfo)in.readObject();
+
+p417 메서드 표참고
+
+
+
+### 7.3 직렬화가 가능한 클래스 만들기 - Serializable, transient
+
+p418설명,419.....
+
+예제15-39,40,41
+
+
+
+### 7.4 직렬화가능한 클래스의 버전관리
+
+> 직렬화된 객체를 역직렬화할 때는 직렬화 했을 때와 같은 클래스 사용
+
+> 클래스 이름이 동일해도 내용이 변경된 경우 역직렬화 실패
+
+- Object객체는 최고조상이므로 직렬화 불가
+- String은 직렬화 가능
+- transient 직렬화대상에서 제외
 
 
 
